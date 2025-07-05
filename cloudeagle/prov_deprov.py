@@ -14,8 +14,7 @@ def provision_user(email, role="Member"):
         page.locator("text=People").first.click()
         page.wait_for_timeout(2000)
 
-        # ⬇️ Click "Add members"
-# Locate and click the "Add members" button in horizontal layout
+
         try:
             add_members_btn = page.locator("div[role='button']", has_text="Add members").first
             add_members_btn.wait_for(state="visible", timeout=5000)
@@ -29,14 +28,13 @@ def provision_user(email, role="Member"):
 
 
 
-        # ⬇️ Fill email field
         email_input = page.locator("input[type='email']").first
         email_input.wait_for(timeout=10000)
         email_input.fill(email)
 
         page.wait_for_timeout(500)
 
-        # Wait for the dropdown overlay to appear with the email
+
         try:
             suggestion = page.locator(f"div:visible >> text={email}").first
             suggestion.wait_for(timeout=5000)
@@ -53,7 +51,7 @@ def provision_user(email, role="Member"):
             send_button.scroll_into_view_if_needed()
             page.wait_for_timeout(500)
 
-            # Retry click until aria-disabled is false
+
             for attempt in range(5):
                 disabled = send_button.get_attribute("aria-disabled")
                 if disabled == "true":
@@ -62,7 +60,7 @@ def provision_user(email, role="Member"):
                 else:
                     send_button.click(force=True)
                     print("[info] Send invite clicked successfully.")
-                    page.wait_for_timeout(3000)  # Wait to observe UI change
+                    page.wait_for_timeout(3000)  
                     break
             else:
                 print("[error] Send invite button never became enabled.")
@@ -87,7 +85,7 @@ def deprovision_user(email):
         page = context.new_page()
 
         try:
-            # Navigate to Notion and Members tab
+
             page.goto("https://www.notion.so", timeout=60000)
             page.wait_for_timeout(8000)
             page.locator("text=Settings").first.click()
@@ -97,7 +95,7 @@ def deprovision_user(email):
             page.locator("div[role='tab']").filter(has_text="Members").first.click()
             page.wait_for_timeout(2000)
 
-            # Locate user rows by data-index
+
             user_rows = page.locator("div[data-index]")
             count = user_rows.count()
             print(f"[debug] Found {count} user rows.")
@@ -110,7 +108,7 @@ def deprovision_user(email):
                 if email in row_text:
                     print(f"[info] Found user row for {email} at index {i}")
                     try:
-                        # Click dropdown (use working method)
+             
                         dropdown = row.locator("div[role='button']").filter(has_text="Workspace owner").first
                         dropdown.wait_for(timeout=3000)
                         dropdown.scroll_into_view_if_needed()
@@ -118,14 +116,13 @@ def deprovision_user(email):
                         print(f"[info] Opened role dropdown for {email}")
                         page.wait_for_timeout(1000)
 
-                        # Click 'Remove from workspace'
                         remove_option = page.locator("div[role='menuitem']").filter(has_text="Remove from workspace").first
                         remove_option.wait_for(timeout=3000)
                         remove_option.click()
                         print(f"[info] Selected 'Remove from workspace' for {email}")
                         page.wait_for_timeout(1000)
 
-                        # Confirm modal
+                 
                         confirm_button = page.locator("div[role='button']").filter(has_text="Remove").first
                         confirm_button.wait_for(timeout=5000)
                         confirm_button.scroll_into_view_if_needed()
@@ -148,7 +145,7 @@ def deprovision_user(email):
         finally:
             browser.close()
 
-# Entry point: Ask user for input
+
 if __name__ == "__main__":
     action = input("Do you want to add or remove a user? (add/remove): ").strip().lower()
 
